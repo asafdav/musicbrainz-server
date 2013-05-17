@@ -24,13 +24,17 @@ CREATE TABLE track2013 AS
     SELECT nextval('track2013_id_seq')::int AS id,
            generate_uuid_v3('6ba7b8119dad11d180b400c04fd430c8',
            'http://musicbrainz.org/track/' || currval('track2013_id_seq') ) AS gid,
-           track.recording, medium.id AS medium,
-           track.position, track.number,
-           track.name, track.artist_credit, track.length,
-           track.edits_pending, track.last_updated
-    FROM track
-    JOIN medium ON medium.tracklist = track.tracklist
-    ORDER BY track.id, medium.id;
+           old_track.recording, old_old_track.medium,
+           old_track.position, old_track.number,
+           old_track.name, old_track.artist_credit, old_track.length,
+           old_track.edits_pending, old_track.last_updated
+    FROM (SELECT track.recording, medium.id AS medium,
+                 track.position, track.number,
+                 track.name, track.artist_credit, track.length,
+                 track.edits_pending, track.last_updated
+          FROM track
+          JOIN medium ON medium.tracklist = track.tracklist
+          ORDER BY track.id, medium.id) old_track;
 
 DROP TABLE track;
 
